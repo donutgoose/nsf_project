@@ -6,7 +6,7 @@ PhysicMaterial:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Skibidi
+  m_Name: Material
   dynamicFriction: 0.34
   staticFriction: 0.36
   bounciness: 0.1

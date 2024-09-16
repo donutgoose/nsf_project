@@ -19,6 +19,10 @@ public class FirstPersonCharacterController : MonoBehaviour
     public float upperLookLimit = -80f;
     public float lowerLookLimit = 80f;
 
+    public GameObject snowballPrefab;  
+    public float snowballForce = 500f;  
+    public KeyCode throwSnowballKey = KeyCode.S;  
+
     private Camera playerCamera;
     private CharacterController characterController;
     private Vector3 moveDirection = Vector3.zero;
@@ -49,6 +53,14 @@ public class FirstPersonCharacterController : MonoBehaviour
             return;
         }
 
+        HandleMouseLook();
+        HandleMovement();
+        HandleJump();
+        HandleSnowballThrowing();
+    }
+
+    private void HandleMouseLook()
+    {
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y");
 
@@ -57,7 +69,10 @@ public class FirstPersonCharacterController : MonoBehaviour
 
         playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
         transform.rotation *= Quaternion.Euler(0, mouseX * lookSpeedX, 0);
+    }
 
+    private void HandleMovement()
+    {
         float moveDirectionX = Input.GetAxis("Horizontal") + (Input.GetKey(KeyCode.RightArrow) ? 1f : 0) - (Input.GetKey(KeyCode.LeftArrow) ? 1f : 0);
         float moveDirectionZ = Input.GetAxis("Vertical") + (Input.GetKey(KeyCode.UpArrow) ? 1f : 0) - (Input.GetKey(KeyCode.DownArrow) ? 1f : 0);
 
@@ -85,10 +100,6 @@ public class FirstPersonCharacterController : MonoBehaviour
         if (characterController.isGrounded)
         {
             ySpeed = -0.1f;
-            if (Input.GetKeyDown(jumpKey))
-            {
-                ySpeed = jumpSpeed;
-            }
         }
         else
         {
@@ -98,5 +109,30 @@ public class FirstPersonCharacterController : MonoBehaviour
         moveDirection = new Vector3(move.x, ySpeed, move.z);
 
         characterController.Move(moveDirection * Time.deltaTime);
+    }
+
+    private void HandleJump()
+    {
+        if (characterController.isGrounded)
+        {
+            if (Input.GetKeyDown(jumpKey))
+            {
+                ySpeed = jumpSpeed;
+            }
+        }
+    }
+
+    private void HandleSnowballThrowing()
+    {
+        if (Input.GetKeyDown(throwSnowballKey) && snowballPrefab != null)
+        {
+            GameObject snowball = Instantiate(snowballPrefab, playerCamera.transform.position + playerCamera.transform.forward, Quaternion.identity);
+
+            Rigidbody rb = snowball.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.AddForce(playerCamera.transform.forward * snowballForce);
+            }
+        }
     }
 }
