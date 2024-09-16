@@ -3,11 +3,12 @@ using UnityEngine.UI;
 
 public class UIDistanceChecker : MonoBehaviour
 {
-    public Transform targetObject;
-    public float distanceThreshold = 10f;
-    public GameObject uiElement; 
+    public Transform object1; 
+    public Transform object2; 
+    public float distanceThreshold = 10f; 
+    public GameObject uiElement;
 
-    private CanvasGroup canvasGroup;
+    private CanvasGroup canvasGroup; 
 
     private void Start()
     {
@@ -16,6 +17,7 @@ public class UIDistanceChecker : MonoBehaviour
             canvasGroup = uiElement.GetComponent<CanvasGroup>();
             if (canvasGroup == null)
             {
+ 
                 canvasGroup = uiElement.AddComponent<CanvasGroup>();
             }
         }
@@ -23,9 +25,9 @@ public class UIDistanceChecker : MonoBehaviour
 
     private void Update()
     {
-        if (targetObject != null && uiElement != null)
+        if (object1 != null && object2 != null && uiElement != null)
         {
-            float distance = Vector3.Distance(transform.position, targetObject.position);
+            float distance = Vector3.Distance(object1.position, object2.position);
             if (distance > distanceThreshold)
             {
                 SetUIVisibility(false);
