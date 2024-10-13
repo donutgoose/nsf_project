@@ -941,6 +941,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1679040686 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -8391222552659086748, guid: 0daf810b9fdd5155bad0d81e8dac46de, type: 3}
+  m_PrefabInstance: {fileID: 617350820}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1792241308
 GameObject:
   m_ObjectHideFlags: 0
@@ -953,45 +958,16 @@ GameObject:
   - component: {fileID: 1792241312}
   - component: {fileID: 1792241311}
   - component: {fileID: 1792241310}
-  - component: {fileID: 1792241309}
-  - component: {fileID: 1792241314}
   - component: {fileID: 1792241315}
+  - component: {fileID: 1792241317}
+  - component: {fileID: 1792241316}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1792241309
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1792241308}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc12457e46bf6fd47817b3c42dfb072b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 5
-  sprintMultiplier: 2
-  jumpSpeed: 10
-  gravity: 20
-  stamina: 1
-  staminaDrainRate: 0
-  staminaRechargeRate: 1
-  sprintKey: 306
-  jumpKey: 32
-  enableSprinting: 1
-  lookSpeedX: 4
-  lookSpeedY: 4
-  upperLookLimit: -80
-  lowerLookLimit: 80
-  snowballPrefab: {fileID: 8895216459131060856, guid: 48990d29d8c11d34ab40c832eed64849, type: 3}
-  snowballForce: 500
-  throwSnowballKey: 122
 --- !u!136 &1792241310
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1081,7 +1057,56 @@ Transform:
   - {fileID: 963194228}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!143 &1792241314
+--- !u!114 &1792241315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1792241308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0a7c4b6623ab1d8c9633fe850529001, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  interactableObject: {fileID: 0}
+--- !u!114 &1792241316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1792241308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc12457e46bf6fd47817b3c42dfb072b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 8
+  sprintMultiplier: 2
+  jumpSpeed: 12
+  gravity: 30
+  stamina: 5
+  staminaDrainRate: 1
+  staminaRechargeRate: 0.5
+  sprintKey: 304
+  jumpKey: 32
+  grappleKey: 120
+  grappleMarkerPrefab: {fileID: 1679040686}
+  grappleSpeed: 10
+  grappleSegmentDistance: 1
+  grappleRange: 50
+  lookSpeedX: 2
+  lookSpeedY: 2
+  upperLookLimit: -80
+  lowerLookLimit: 80
+  snowballPrefab: {fileID: 8895216459131060856, guid: 48990d29d8c11d34ab40c832eed64849, type: 3}
+  snowballForce: 500
+  throwSnowballKey: 122
+--- !u!143 &1792241317
 CharacterController:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1107,22 +1132,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1792241315
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1792241308}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a0a7c4b6623ab1d8c9633fe850529001, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  interactableObject: {fileID: 0}
 --- !u!1 &1816542188
 GameObject:
   m_ObjectHideFlags: 0
