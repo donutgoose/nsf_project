@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-// Grapple range of 0 is unlimited
+
 [RequireComponent(typeof(CharacterController))]
 public class FirstPersonCharacterController : MonoBehaviour
 {
@@ -19,6 +19,8 @@ public class FirstPersonCharacterController : MonoBehaviour
     public float grappleSpeed = 5f;
     public float grappleSegmentDistance = 1f;
     public float grappleRange = 0f;
+
+    public bool canGrapple = true;
 
     public float lookSpeedX = 2f;
     public float lookSpeedY = 2f;
@@ -127,44 +129,43 @@ public class FirstPersonCharacterController : MonoBehaviour
 
     private void HandleGrapple()
     {
-        if (Input.GetKeyDown(grappleKey))
+        if (!canGrapple || !Input.GetKeyDown(grappleKey)) return;
+
+        if (grapplePoints.Count > 0)
         {
-            if (grapplePoints.Count > 0)
+            grapplePoints.Clear();
+            foreach (var marker in grappleMarkers)
             {
-                grapplePoints.Clear();
-                foreach (var marker in grappleMarkers)
-                {
-                    Destroy(marker);
-                }
-                grappleMarkers.Clear();
+                Destroy(marker);
+            }
+            grappleMarkers.Clear();
+        }
+
+        Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            Vector3 direction = (hit.point - transform.position).normalized;
+            float distance = Vector3.Distance(transform.position, hit.point);
+            if (grappleRange > 0 && distance > grappleRange)
+            {
+                distance = grappleRange;
             }
 
-            Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
+            int segments = Mathf.FloorToInt(distance / grappleSegmentDistance);
 
-            if (Physics.Raycast(ray, out hit))
+            for (int i = 0; i <= segments; i++)
             {
-                Vector3 direction = (hit.point - transform.position).normalized;
-                float distance = Vector3.Distance(transform.position, hit.point);
-                if (grappleRange > 0 && distance > grappleRange)
-                {
-                    distance = grappleRange;
-                }
-
-                int segments = Mathf.FloorToInt(distance / grappleSegmentDistance);
-
-                for (int i = 0; i <= segments; i++)
-                {
-                    Vector3 grapplePoint = transform.position + direction * (i * grappleSegmentDistance);
-                    grapplePoints.Add(grapplePoint);
-                    GameObject marker = Instantiate(grappleMarkerPrefab, grapplePoint, Quaternion.identity);
-                    grappleMarkers.Add(marker);
-                }
-
-                currentGrappleIndex = 0;
-                isGrappling = true;
-                StartCoroutine(MoveAlongGrapple());
+                Vector3 grapplePoint = transform.position + direction * (i * grappleSegmentDistance);
+                grapplePoints.Add(grapplePoint);
+                GameObject marker = Instantiate(grappleMarkerPrefab, grapplePoint, Quaternion.identity);
+                grappleMarkers.Add(marker);
             }
+
+            currentGrappleIndex = 0;
+            isGrappling = true;
+            StartCoroutine(MoveAlongGrapple());
         }
     }
 
