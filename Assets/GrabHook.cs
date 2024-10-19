@@ -10,7 +10,6 @@ public class PlayerCollisionTrigger : MonoBehaviour
 
             if (targetScript != null)
             {
-                targetScript.canGrapple = true;
                 Destroy(gameObject);
             }
         }

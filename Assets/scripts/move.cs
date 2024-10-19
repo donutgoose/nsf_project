@@ -14,19 +14,6 @@ public class FirstPersonCharacterController : MonoBehaviour
     public float staminaRechargeRate = 0.5f;
     public KeyCode sprintKey = KeyCode.LeftShift;
     public KeyCode jumpKey = KeyCode.Space;
-    public KeyCode grappleKey = KeyCode.X;
-    public GameObject grappleMarkerPrefab;
-    public float grappleSpeed = 5f;
-    public float grappleSegmentDistance = 1f;
-    public float grappleRange = 0f;
-
-    public bool canGrapple = true;
-
-    public float lookSpeedX = 2f;
-    public float lookSpeedY = 2f;
-    public float upperLookLimit = -80f;
-    public float lowerLookLimit = 80f;
-
     public GameObject snowballPrefab;
     public float snowballForce = 500f;
     public KeyCode throwSnowballKey = KeyCode.S;
@@ -36,10 +23,6 @@ public class FirstPersonCharacterController : MonoBehaviour
     private Vector3 moveDirection = Vector3.zero;
     private float ySpeed = 0f;
     private float rotationX = 0f;
-    private List<Vector3> grapplePoints = new List<Vector3>();
-    private List<GameObject> grappleMarkers = new List<GameObject>();
-    private int currentGrappleIndex = 0;
-    private bool isGrappling = false;
 
     private void Start()
     {
@@ -66,7 +49,6 @@ public class FirstPersonCharacterController : MonoBehaviour
         HandleMovement();
         HandleJump();
         HandleSnowballThrowing();
-        HandleGrapple();
     }
 
     private void HandleMouseLook()
@@ -74,17 +56,15 @@ public class FirstPersonCharacterController : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y");
 
-        rotationX -= mouseY * lookSpeedY;
-        rotationX = Mathf.Clamp(rotationX, upperLookLimit, lowerLookLimit);
+        rotationX -= mouseY * 2f; // Use the same look speed as before
+        rotationX = Mathf.Clamp(rotationX, -80f, 80f);
 
         playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
-        transform.rotation *= Quaternion.Euler(0, mouseX * lookSpeedX, 0);
+        transform.rotation *= Quaternion.Euler(0, mouseX * 2f, 0);
     }
 
     private void HandleMovement()
     {
-        if (isGrappling) return;
-
         float moveX = Input.GetAxis("Horizontal");
         float moveZ = Input.GetAxis("Vertical");
 
@@ -108,7 +88,7 @@ public class FirstPersonCharacterController : MonoBehaviour
 
     private void HandleJump()
     {
-        if (characterController.isGrounded && Input.GetKeyDown(jumpKey) && !isGrappling)
+        if (characterController.isGrounded && Input.GetKeyDown(jumpKey))
         {
             ySpeed = jumpSpeed;
         }
@@ -125,73 +105,5 @@ public class FirstPersonCharacterController : MonoBehaviour
                 rb.AddForce(playerCamera.transform.forward * snowballForce);
             }
         }
-    }
-
-    private void HandleGrapple()
-    {
-        if (!canGrapple || !Input.GetKeyDown(grappleKey)) return;
-
-        if (grapplePoints.Count > 0)
-        {
-            grapplePoints.Clear();
-            foreach (var marker in grappleMarkers)
-            {
-                Destroy(marker);
-            }
-            grappleMarkers.Clear();
-        }
-
-        Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit))
-        {
-            Vector3 direction = (hit.point - transform.position).normalized;
-            float distance = Vector3.Distance(transform.position, hit.point);
-            if (grappleRange > 0 && distance > grappleRange)
-            {
-                distance = grappleRange;
-            }
-
-            int segments = Mathf.FloorToInt(distance / grappleSegmentDistance);
-
-            for (int i = 0; i <= segments; i++)
-            {
-                Vector3 grapplePoint = transform.position + direction * (i * grappleSegmentDistance);
-                grapplePoints.Add(grapplePoint);
-                GameObject marker = Instantiate(grappleMarkerPrefab, grapplePoint, Quaternion.identity);
-                grappleMarkers.Add(marker);
-            }
-
-            currentGrappleIndex = 0;
-            isGrappling = true;
-            StartCoroutine(MoveAlongGrapple());
-        }
-    }
-
-    private IEnumerator MoveAlongGrapple()
-    {
-        while (currentGrappleIndex < grapplePoints.Count)
-        {
-            Vector3 startPosition = transform.position;
-            Vector3 targetPosition = grapplePoints[currentGrappleIndex];
-            float journeyLength = Vector3.Distance(startPosition, targetPosition);
-            float journeyProgress = 0f;
-
-            while (journeyProgress < journeyLength)
-            {
-                journeyProgress += grappleSpeed * Time.deltaTime;
-                float t = journeyProgress / journeyLength;
-                transform.position = Vector3.Lerp(startPosition, targetPosition, t * t);
-                yield return null;
-            }
-
-            Destroy(grappleMarkers[currentGrappleIndex]);
-            grappleMarkers[currentGrappleIndex] = null;
-
-            currentGrappleIndex++;
-        }
-
-        isGrappling = false;
     }
 }
