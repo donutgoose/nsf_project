@@ -1,25 +1,31 @@
 using UnityEngine;
+using System.Collections;
 
 public class PlayerGrapple : MonoBehaviour
 {
-    public LineRenderer lineRenderer; // component to render the grappling line
-    public LayerMask grappleableLayer; // layer for grappling objects
+    public LineRenderer lineRenderer;
+    public float maxGrappleDistance = 10f;
+    public int teleportCount = 100;
+    public float timePerMove = 0.05f;
 
-    private bool isGrappling = false; // indicates if the player is currently grappling
-    private Vector3 grapplePoint; // point where the player is grappling
-    private float grappleDuration = 2f; // duration for maximum distance
-    private float grappleStartTime; // time when the grapple started
-    private float maxGrappleDistance = 10f; // maximum distance for grappling
+    private Coroutine grappleCoroutine;
+    private bool isGrappling = false;
+    private Vector3 grapplePoint;
+    private CharacterController characterController;
 
     void Start()
     {
-        lineRenderer.enabled = false;
+        characterController = GetComponent<CharacterController>();
+        if (lineRenderer != null)
+        {
+            lineRenderer.enabled = false;
+        }
     }
 
     void Update()
     {
         if (Input.GetButtonDown("Fire1")) StartGrapple();
-        else if (Input.GetButtonUp("Fire1")) StopGrapple();
+        if (Input.GetButtonUp("Fire1")) StopGrapple();
 
         if (isGrappling) UpdateGrapple();
     }
@@ -27,36 +33,69 @@ public class PlayerGrapple : MonoBehaviour
     void StartGrapple()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, grappleableLayer))
+        if (Physics.Raycast(ray, out RaycastHit hit, maxGrappleDistance))
         {
             grapplePoint = hit.point;
-            isGrappling = true;
-            lineRenderer.enabled = true;
-            lineRenderer.SetPosition(0, transform.position);
-            lineRenderer.SetPosition(1, grapplePoint);
 
-            float distance = Vector3.Distance(transform.position, grapplePoint);
-            grappleDuration = Mathf.Clamp(distance / maxGrappleDistance * 2f, 1f, 5f);
-            grappleStartTime = Time.time;
+            if (grappleCoroutine != null)
+            {
+                StopCoroutine(grappleCoroutine);
+            }
+
+            isGrappling = true;
+
+            if (lineRenderer != null)
+            {
+                lineRenderer.positionCount = 2;
+                lineRenderer.enabled = true;
+                lineRenderer.SetPosition(0, transform.position);
+                lineRenderer.SetPosition(1, grapplePoint);
+            }
+
+            grappleCoroutine = StartCoroutine(MoveToGrapplePoint());
+        }
+        else
+        {
+            StopGrapple();
         }
     }
 
     void UpdateGrapple()
     {
-        float elapsed = Time.time - grappleStartTime;
-        if (elapsed < grappleDuration)
+        if (lineRenderer != null)
         {
-            float t = elapsed / grappleDuration;
-            transform.position = Vector3.Lerp(transform.position, grapplePoint, t);
             lineRenderer.SetPosition(0, transform.position);
-            lineRenderer.SetPosition(1, grapplePoint);
         }
-        else StopGrapple();
+    }
+
+    private IEnumerator MoveToGrapplePoint()
+    {
+        Vector3 startPosition = transform.position;
+        float totalDistance = Vector3.Distance(startPosition, grapplePoint);
+        float elapsedTime = 0f;
+        float duration = totalDistance / (teleportCount * timePerMove);
+
+        while (elapsedTime < duration)
+        {
+            float t = elapsedTime / duration;
+            transform.position = Vector3.Lerp(startPosition, grapplePoint, t);
+            elapsedTime += Time.deltaTime;
+
+            yield return null;
+        }
+
+        transform.position = grapplePoint;
+        StopGrapple();
     }
 
     void StopGrapple()
     {
         isGrappling = false;
-        lineRenderer.enabled = false;
+        if (lineRenderer != null)
+        {
+            lineRenderer.enabled = false;
+            lineRenderer.positionCount = 0;
+        }
+        characterController.enabled = true;
     }
 }
