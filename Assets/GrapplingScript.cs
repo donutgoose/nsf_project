@@ -8,6 +8,9 @@ public class PlayerGrapple : MonoBehaviour
     public int teleportCount = 100;
     public float timePerMove = 0.05f;
 
+    // Public property to control grappling
+    public bool canGrapple = true;
+
     private Coroutine grappleCoroutine;
     private bool isGrappling = false;
     private Vector3 grapplePoint;
@@ -24,7 +27,7 @@ public class PlayerGrapple : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetButtonDown("Fire1")) StartGrapple();
+        if (Input.GetButtonDown("Fire1") && canGrapple) StartGrapple();
         if (Input.GetButtonUp("Fire1")) StopGrapple();
 
         if (isGrappling) UpdateGrapple();
